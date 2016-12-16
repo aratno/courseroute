@@ -6,6 +6,8 @@ author: Abe Ratnofsky
 '''
 
 import os
+import json
+import pprint
 
 def data_exists():
     '''
@@ -25,7 +27,12 @@ def parse_json(path):
     '''
     Parses JSON into a dict, prunes out unnecessary keys, and generates a graph.
     '''
-    pass
+    with open(path) as f:
+        dump = json.load(f)
+        code_to_prereqs = {}
+        for k in dump:
+            code_to_prereqs[dump[k]['code']] = dump[k]['prerequisite']
+        pprint.pprint(code_to_prereqs)
 
 if __name__ == '__main__':
     datapath = data_exists()
@@ -35,3 +42,5 @@ if __name__ == '__main__':
         print('No data available')
         exit(1)
     
+    parse_json(datapath)
+

@@ -14,12 +14,12 @@ import time
 from flask import Flask
 
 '''
-This grabs a small(er) dataset; only 2nd-year CSC courses. It does not do as
-much error checking as it could, but this is a toy example.     ¯\_(ツ)_/¯
+This grabs all CSC courses. It does not do as much error checking as it could,
+but this is a toy example.     ¯\_(ツ)_/¯
 '''
 def get_abridged_data():
     url = 'https://timetable.iit.artsci.utoronto.ca/api/courses'
-    params = {'code':'CSC', 'section':'F', 'studyyear':2}
+    params = {'code':'CSC', 'section':'F'}
     print('Fetching url...')
     r = requests.get(url, params=params)
     output_dir = 'data/'

@@ -30,9 +30,27 @@ def parse_json(path):
     with open(path) as f:
         dump = json.load(f)
         code_to_prereqs = {}
-        for k in dump:
-            code_to_prereqs[dump[k]['code']] = dump[k]['prerequisite']
+        # take course code and prerequisites only
+        for k, v in dump.items():
+            code_to_prereqs[v['code']] = v['prerequisite']
+
         pprint.pprint(code_to_prereqs)
+
+def parse_prereqs(prereq_str):
+    '''
+    Course prerequisites are expressed as semi-structured human-readable
+    explanations, and require translation into more formal predicates.
+
+    Here are some examples of prerequisite explanations, from the calendar:
+        'CSC209H1, CSC258H1, CSC263H1/CSC265H1, STA247H1/STA255H1/STA257H1/ECO227Y1'
+        'STA247H1/STA255H1/STA257H1 or familiarity with basic probability
+            theory, including Bayes's theorem; CSC207H1/CSC209H1 or
+            proficiency in Python and software development.'
+        'Permission of the instructor'
+        'Any half-course on computing'
+    '''
+
+    pass
 
 if __name__ == '__main__':
     datapath = data_exists()

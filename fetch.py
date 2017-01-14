@@ -11,22 +11,57 @@ author: Abe Ratnofsky
 
 import requests
 import time
-from flask import Flask
+import json
+import os
+import pprint   # debugging
+
+from course import Course
+
+data_dir = 'data/'
 
 '''
-Grabs data for all CSC courses. It does not do as much error checking as it
-could.  ¯\_(ツ)_/¯
+Grabs data for all CSC courses, and writes it to a file. Returns the filepath
+written to.
 '''
 def fetch(url):
+    # fetch data
     params = {'code':'CSC'}
     print('Fetching URL {}...'.format(url))
     r = requests.get(url, params=params)
     print('URL {} fetched'.format(url))
-    output_dir = 'data/'
-    f = open(output_dir + 'data-{}.json'.format(time.time()), 'w') 
+
+    # write to disk
+    filepath = data_dir + 'data-{}.json'.format(time.time())
+    f = open(filepath, 'w') 
     f.write(r.text)
-    print('File successfully written to ' + output_dir)
+    print('File successfully written to {}'.format(filepath))
+    return filepath
+
+'''
+Returns an array of Courses, populated from the fetched JSON.
+'''
+def parse(filepath):
+    f = open(filepath, 'r')
+    j = json.load(f)
+    v = list(j.values())
+    all_courses = set()
+    for course_dump in v:
+        c = Course(
+                course_dump['code'], course_dump['courseTitle'],
+                course_dump['courseDescription'], course_dump['prerequisite'],
+                course_dump['corequisite'], course_dump['exclusion'])
+        all_courses.add(c)
+    pprint.pprint(all_courses)
+    # TODO: determine format for prerequisite, corequisite, exclusion
 
 if __name__ == '__main__':
     url = 'https://timetable.iit.artsci.utoronto.ca/api/courses'
-    fetch(url)
+    # TODO: if data dir empty, fetch, else use first dump; use os.listdir
+    data_filepaths = list(map(lambda filename: data_dir+filename, os.listdir(data_dir)))
+    if len(data_filepaths) == 0:
+        print('No data found, fetching new data')
+        fp = fetch(url)
+    else:
+        fp = data_filepaths[0]
+        print('Existing data found, using {}'.format(fp))
+    parse(fp)

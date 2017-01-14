@@ -1,5 +1,5 @@
 '''
-grab_data:
+fetch:
     This file offers some basic functions for downloading local copies of
     course data. This is to keep testing reliable and prevent bloat in the
     repository. All data files are downloaded from the iit.utoronto.ca API
@@ -14,18 +14,19 @@ import time
 from flask import Flask
 
 '''
-This grabs all CSC courses. It does not do as much error checking as it could,
-but this is a toy example.     ¯\_(ツ)_/¯
+Grabs data for all CSC courses. It does not do as much error checking as it
+could.  ¯\_(ツ)_/¯
 '''
-def get_abridged_data():
-    url = 'https://timetable.iit.artsci.utoronto.ca/api/courses'
-    params = {'code':'CSC', 'section':'F'}
-    print('Fetching url...')
+def fetch(url):
+    params = {'code':'CSC'}
+    print('Fetching URL {}...'.format(url))
     r = requests.get(url, params=params)
+    print('URL {} fetched'.format(url))
     output_dir = 'data/'
-    f = open(output_dir + 'abridged_data_dump - '  + str(time.time()) + '.json', 'w') 
+    f = open(output_dir + 'data-{}.json'.format(time.time()), 'w') 
     f.write(r.text)
     print('File successfully written to ' + output_dir)
 
 if __name__ == '__main__':
-    get_abridged_data()
+    url = 'https://timetable.iit.artsci.utoronto.ca/api/courses'
+    fetch(url)

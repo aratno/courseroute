@@ -10,12 +10,14 @@ author: Abe Ratnofsky
 '''
 
 import requests
+import random
 import time
 import json
 import os
 import pprint   # debugging
 
 from course import Course
+from parse import description_into_predicate
 
 data_dir = 'data/'
 
@@ -48,11 +50,16 @@ def parse(filepath):
     for course_dump in v:
         c = Course(
                 course_dump['code'], course_dump['courseTitle'],
-                course_dump['courseDescription'], course_dump['prerequisite'],
-                course_dump['corequisite'], course_dump['exclusion'])
+                course_dump['courseDescription'],
+                course_dump['prerequisite'],
+                course_dump['corequisite'],
+                course_dump['exclusion'])
         all_courses.add(c)
-    pprint.pprint(all_courses)
-    # TODO: determine format for prerequisite, corequisite, exclusion
+
+    # Test parsing on sample course
+    sample = random.choice(list(all_courses))
+    print(sample.code, sample.title)
+    description_into_predicate(sample.prerequisite)
 
 if __name__ == '__main__':
     url = 'https://timetable.iit.artsci.utoronto.ca/api/courses'

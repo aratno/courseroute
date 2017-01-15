@@ -6,11 +6,14 @@ parse:
 author: Abe Ratnofsky
 '''
 
+import re
+import pprint   # debug
+
 '''
-Parses prerequisite strings (as provided by the artsci calendar) into formal
-predicates over a courseload.
+Parses prerequisite description strings (as provided by the artsci calendar)
+into formal predicates over a courseload.
 '''
-def prerequisite_into_predicate(url):
+def description_into_predicate(desc):
     '''
     Examples:
     CSC148H1 : CSC108H1/(equivalent programming experience)
@@ -58,7 +61,38 @@ def prerequisite_into_predicate(url):
     CSC463H1 : CSC236H1/CSC240H1
     CSC465H1 : CSC236H1/CSC240H1/MAT309H1
     '''
-    pass
+
+    if not desc:
+        return (lambda: True)
+
+    # Check if requirements are complex
+    desc_cpy = desc[:]
+    # remove course codes
+    desc_cpy = re.sub(r'[A-Z]{3}[0-9]{3}[HY]1', '', desc_cpy)
+    # remove simple characters
+    desc_cpy = re.sub(r'[ /,]', '', desc_cpy)
+    # if more is left, description is complex
+    if desc_cpy:
+        print('Description was too complex to parse')
+        return
+
+    # Normalize commas and semicolons
+    desc = desc.replace(';', ',')
+
+    # Parenthesize clauses for order of operations
+    clauses = list(map(lambda clause: '('+clause+')', desc.split(',')))
+
+    # Replace slash with or
+    clauses = list(map(lambda clause: clause.replace('/', ' or '), clauses))
+
+    # Join with and
+    predicate = ' and '.join(clauses)
+
+    # Replace course codes with inclusion check code
+    def repl(matchobj):
+        return '({} in courses_taken)'.format(matchobj.group(0))
+    final = re.sub(r'[A-Z]{3}[0-9]{3}[HY]1', repl, predicate)
+    print('Predicate {}'.format(final))
 
 if __name__ == '__main__':
     pass

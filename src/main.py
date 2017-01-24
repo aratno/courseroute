@@ -11,10 +11,12 @@ from flask import render_template
 from flask import url_for
 app = Flask(__name__)
 
+static_dir = 'static/'
+
 # Route static files to their own folder
 @app.route('/static/<path:path>')
 def send_static(path):
-    return send_from_directory('static', path)
+    return send_from_directory(static_dir, path)
 
 # Homepage
 @app.route('/', methods=['GET'])

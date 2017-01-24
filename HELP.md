@@ -10,7 +10,7 @@ $ virtualenv venv -p python3
 ```
 To start using it, run:
 ```
-$ venv/bin/activate
+$ source venv/bin/activate
 ```
 On completion, this should prepend `(venv)` to your prompt. To install the
 dependencies, run:

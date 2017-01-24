@@ -17,3 +17,16 @@ class Course:
 
     def __repr__(self):
         return '({}, {})'.format(self.code, self.title)
+
+class CourseLoad:
+    def __init__(self, past=None, current=None):
+        if not past:
+            self.past = set()
+        if not current:
+            self.current = set()
+
+    def has_taken(self, course):
+        return (course in self.past)
+
+    def is_taking(self):
+        return (course in self.current)

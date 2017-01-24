@@ -10,10 +10,29 @@ import re
 import pprint   # debug
 
 '''
+Returns True if the prerequisite description is too complex to naively parse,
+otherwise False.
+'''
+def is_desc_complex(desc):
+    desc_cpy = desc[:]
+    # Normalize commas and semicolons
+    desc_cpy = desc_cpy.replace(';', ',')
+    # remove course codes
+    desc_cpy = re.sub(r'[A-Z]{3}[0-9]{3}[HY]1', '', desc_cpy)
+    # remove simple characters
+    desc_cpy = re.sub(r'[ /,()]', '', desc_cpy)
+    # if more is left, description is complex
+    if desc_cpy:
+        print('Description was too complex to parse:', desc)
+        return True
+    print('Description was simple:', desc)
+    return False
+
+'''
 Parses prerequisite description strings (as provided by the artsci calendar)
 into formal predicates over a courseload.
 '''
-def description_into_predicate(desc):
+def naive_description_into_predicate(desc):
     '''
     Examples:
     CSC148H1 : CSC108H1/(equivalent programming experience)
@@ -62,18 +81,8 @@ def description_into_predicate(desc):
     CSC465H1 : CSC236H1/CSC240H1/MAT309H1
     '''
 
-    if not desc:
-        return (lambda: True)
-
     # Check if requirements are complex
-    desc_cpy = desc[:]
-    # remove course codes
-    desc_cpy = re.sub(r'[A-Z]{3}[0-9]{3}[HY]1', '', desc_cpy)
-    # remove simple characters
-    desc_cpy = re.sub(r'[ /,]', '', desc_cpy)
-    # if more is left, description is complex
-    if desc_cpy:
-        print('Description was too complex to parse')
+    if is_desc_complex(desc):
         return
 
     # Normalize commas and semicolons
@@ -90,9 +99,9 @@ def description_into_predicate(desc):
 
     # Replace course codes with inclusion check code
     def repl(matchobj):
-        return '({} in courses_taken)'.format(matchobj.group(0))
-    final = re.sub(r'[A-Z]{3}[0-9]{3}[HY]1', repl, predicate)
-    print('Predicate {}'.format(final))
+        return '(course_load.has_taken({}))'.format(matchobj.group(0), matchobj.group(1))
+    final = re.sub(r'[A-Z]{3}([0-9]{3})[HY]1', repl, predicate)
+    print('Computed predicate:', final)
 
 if __name__ == '__main__':
     pass

@@ -16,8 +16,8 @@ import json
 import os
 import pprint   # debugging
 
-from course import Course
-from parse import description_into_predicate
+import course
+import parse
 
 data_dir = 'data/'
 
@@ -34,7 +34,7 @@ def fetch(url):
 
     # write to disk
     filepath = data_dir + 'data-{}.json'.format(time.time())
-    f = open(filepath, 'w') 
+    f = open(filepath, 'w')
     f.write(r.text)
     print('File successfully written to {}'.format(filepath))
     return filepath
@@ -42,13 +42,13 @@ def fetch(url):
 '''
 Returns an array of Courses, populated from the fetched JSON.
 '''
-def parse(filepath):
+def parse_dump(filepath):
     f = open(filepath, 'r')
     j = json.load(f)
     v = list(j.values())
     all_courses = set()
     for course_dump in v:
-        c = Course(
+        c = course.Course(
                 course_dump['code'], course_dump['courseTitle'],
                 course_dump['courseDescription'],
                 course_dump['prerequisite'],
@@ -58,12 +58,11 @@ def parse(filepath):
 
     # Test parsing on sample course
     sample = random.choice(list(all_courses))
-    print(sample.code, sample.title)
-    description_into_predicate(sample.prerequisite)
+    print('Sample course for testing:', sample.code, sample.title)
+    parse.is_desc_complex(sample.prerequisite)
 
 if __name__ == '__main__':
     url = 'https://timetable.iit.artsci.utoronto.ca/api/courses'
-    # TODO: if data dir empty, fetch, else use first dump; use os.listdir
     data_filepaths = list(map(lambda filename: data_dir+filename, os.listdir(data_dir)))
     if len(data_filepaths) == 0:
         print('No data found, fetching new data')
@@ -71,4 +70,4 @@ if __name__ == '__main__':
     else:
         fp = data_filepaths[0]
         print('Existing data found, using {}'.format(fp))
-    parse(fp)
+    parse_dump(fp)

@@ -22,3 +22,6 @@ file, to your environment.
 Once these steps are complete, run `main.py`, open your web browser, and go to
 `http://127.0.0.1:5000/`. To terminate the program, press CTRL+C.
 
+### How do I test?
+We're using the Python `unittest` library. Tests are kept separate from source
+files, in `test/`, and can be run with `python -m unittest test.test_parse`.

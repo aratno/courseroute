@@ -2,7 +2,6 @@
 parse:
     Utility functions for parsing calendar data. Currently, the main use is
     parsing course prerequisites (as strings) into predicates.
-
 author: Abe Ratnofsky
 '''
 
@@ -23,9 +22,7 @@ def is_desc_complex(desc):
     desc_cpy = re.sub(r'[ /,()]', '', desc_cpy)
     # if more is left, description is complex
     if desc_cpy:
-        print('Description was too complex to parse:', desc)
         return True
-    print('Description was simple:', desc)
     return False
 
 '''

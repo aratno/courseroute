@@ -2,6 +2,7 @@ import unittest
 
 import src
 from src import parse
+from src import course
 
 class TestPredicateParsing(unittest.TestCase):
     def test_ambiguous_selection(self):
@@ -51,16 +52,25 @@ class TestPredicateParsing(unittest.TestCase):
         self.assertFalse(parse.is_desc_complex('CSC236H1/CSC240H1'))
         self.assertFalse(parse.is_desc_complex('CSC209H1, CSC258H1, CSC263H1/CSC265H1, STA247H1/STA255H1/STA257H1/ECO227Y1'))
         self.assertFalse(parse.is_desc_complex('CSC236H1/CSC240H1'))
-        self.assertFalse(parse.is_desc_complex('CSC236H1/CSC240H1/MAT309H1')) 
+        self.assertFalse(parse.is_desc_complex('CSC236H1/CSC240H1/MAT309H1'))
 
+class TestHardCodedPrereqPredicates(unittest.TestCase):
     '''
-    def test_split(self):
-        s = 'hello world'
-        self.assertEqual(s.split(), ['hello', 'world'])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
+    Set up mock course load to check if CSC258 hard-coded prerequisite function
+    is correct.
     '''
+    def setUp(self):
+        past_courses_sat = list(map(lambda code_str: course.Course(code=code_str, title=None, description=None, prerequisite=None, corequisite=None, exclusion=None), ['CSC108H1', 'CSC148H1', 'CSC165H1', 'CSC207H1', 'CSC236H1']))
+        past_courses_nosat = list(map(lambda code_str: course.Course(code=code_str, title=None, description=None, prerequisite=None, corequisite=None, exclusion=None), ['CSC108H1', 'CSC165H1']))
+
+        self.course_load_sat_CSC258 = course.CourseLoad(past=past_courses_sat, current=None)
+        self.course_load_nosat_CSC258 = course.CourseLoad(past=past_courses_nosat, current=None)
+
+    def test_CSC258_sat(self):
+        c = course.Course(code='CSC258H1', title=None, description=None, prerequisite=None, corequisite=None, exclusion=None)
+        c.prerequisite = parse.get_hard_coded_prereq_predicate(c)
+        self.assertTrue(c.prerequisite(self.course_load_sat_CSC258))
+        self.assertFalse(c.prerequisite(self.course_load_nosat_CSC258))
 
 if __name__ == '__main__':
     unittest.main()

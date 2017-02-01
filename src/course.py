@@ -16,17 +16,27 @@ class Course:
         self.exclusion = exclusion
 
     def __repr__(self):
-        return '({}, {})'.format(self.code, self.title)
+        return '<Course code: {}, title: {}>'.format(self.code, self.title)
 
 class CourseLoad:
     def __init__(self, past=None, current=None):
         if not past:
             self.past = set()
+        else:
+            self.past = past
         if not current:
             self.current = set()
+        else:
+            self.current = current
 
-    def has_taken(self, course):
-        return (course in self.past)
+
+    def has_taken(self, course=None, code=None):
+        if course:
+            return (course in self.past)
+        elif code:
+            return (code in list(map(lambda course: course.code, self.past)))
+        else:
+            raise Exception('Parameters do not make sense')
 
     def is_taking(self):
         return (course in self.current)
